@@ -15,7 +15,7 @@ export default function Home() {
   const [habits, setHabits] = useState(HABITS);
   const today = new Date().toDateString();
 
-  const toggle = (id) => {
+  const toggle = (id : number) => {
     setCompleted((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
@@ -26,7 +26,7 @@ export default function Home() {
     setCustomHabit("");
   };
 
-  const deleteHabit = (id) => {
+  const deleteHabit = (id : number) => {
     setHabits((prev) => prev.filter((h) => h.id !== id));
   };
 
