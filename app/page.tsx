@@ -1,7 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
 
-const DEFAULT_HABITS = [
+type Habit = { id: number; name: string; icon: string; color: string };
+type Completed = { [key: number]: boolean };
+
+const DEFAULT_HABITS: Habit[] = [
   { id: 1, name: "Drink 8 glasses of water", icon: "💧", color: "from-blue-400 to-cyan-400" },
   { id: 2, name: "Exercise for 30 mins", icon: "🏃", color: "from-orange-400 to-red-400" },
   { id: 3, name: "Read for 20 mins", icon: "📚", color: "from-green-400 to-emerald-400" },
@@ -29,10 +32,10 @@ const QUOTES = [
 ];
 
 export default function Home() {
-  const [completed, setCompleted] = useState({});
-  const [habits, setHabits] = useState(DEFAULT_HABITS);
+  const [completed, setCompleted] = useState<Completed>({});
+  const [habits, setHabits] = useState<Habit[]>(DEFAULT_HABITS);
   const [customHabit, setCustomHabit] = useState("");
-  const [streak, setStreak] = useState(4);
+  const [streak] = useState(4);
   const [quote] = useState(QUOTES[0]);
   const [showConfetti, setShowConfetti] = useState(false);
   const today = new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
@@ -45,7 +48,7 @@ export default function Home() {
     else setShowConfetti(false);
   }, [progress]);
 
-  const toggle = (id) => {
+  const toggle = (id: number) => {
     setCompleted((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
@@ -56,7 +59,7 @@ export default function Home() {
     setCustomHabit("");
   };
 
-  const deleteHabit = (id) => {
+  const deleteHabit = (id: number) => {
     setHabits((prev) => prev.filter((h) => h.id !== id));
     setCompleted((prev) => { const n = { ...prev }; delete n[id]; return n; });
   };
@@ -80,7 +83,7 @@ export default function Home() {
             HabitFlow ✨
           </h1>
           <p className="text-slate-400 text-sm">{today}</p>
-          <p className="text-yellow-300 text-xs mt-2 italic">"{quote}"</p>
+          <p className="text-yellow-300 text-xs mt-2 italic">&quot;{quote}&quot;</p>
         </div>
 
         {/* Streak */}
@@ -129,32 +132,19 @@ export default function Home() {
         {/* Habits List */}
         <div className="space-y-3 mb-4">
           {habits.map((habit) => (
-            <div
-              key={habit.id}
-              className={`rounded-2xl shadow-lg overflow-hidden transition-all duration-300 ${
-                completed[habit.id] ? "opacity-80 scale-98" : "hover:scale-101"
-              }`}
-            >
-              <div className={`bg-gradient-to-r ${habit.color} p-px rounded-2xl`}>
-                <div className={`flex items-center justify-between p-4 rounded-2xl ${
-                  completed[habit.id] ? "bg-slate-800/80" : "bg-slate-800"
-                }`}>
-                  <button onClick={() => toggle(habit.id)} className="flex items-center gap-3 flex-1 text-left">
-                    <span className="text-2xl">{habit.icon}</span>
-                    <span className={`font-medium text-sm ${
-                      completed[habit.id] ? "line-through text-slate-500" : "text-white"
-                    }`}>
-                      {habit.name}
-                    </span>
-                  </button>
-                  <div className="flex items-center gap-2">
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                      completed[habit.id] ? "bg-green-500 border-green-500" : "border-slate-500"
-                    }`}>
-                      {completed[habit.id] && <span className="text-xs text-white">✓</span>}
-                    </div>
-                    <button onClick={() => deleteHabit(habit.id)} className="text-slate-600 hover:text-red-400 text-xs">✕</button>
+            <div key={habit.id} className={`bg-gradient-to-r ${habit.color} p-px rounded-2xl`}>
+              <div className={`flex items-center justify-between p-4 rounded-2xl ${completed[habit.id] ? "bg-slate-800/80" : "bg-slate-800"}`}>
+                <button onClick={() => toggle(habit.id)} className="flex items-center gap-3 flex-1 text-left">
+                  <span className="text-2xl">{habit.icon}</span>
+                  <span className={`font-medium text-sm ${completed[habit.id] ? "line-through text-slate-500" : "text-white"}`}>
+                    {habit.name}
+                  </span>
+                </button>
+                <div className="flex items-center gap-2">
+                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${completed[habit.id] ? "bg-green-500 border-green-500" : "border-slate-500"}`}>
+                    {completed[habit.id] && <span className="text-xs text-white">✓</span>}
                   </div>
+                  <button onClick={() => deleteHabit(habit.id)} className="text-slate-600 hover:text-red-400 text-xs">✕</button>
                 </div>
               </div>
             </div>
@@ -173,21 +163,15 @@ export default function Home() {
               placeholder="e.g. Journal writing..."
               className="flex-1 bg-slate-700 border border-slate-600 rounded-xl px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
-            <button
-              onClick={addHabit}
-              className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-xl text-sm font-medium hover:opacity-90"
-            >
+            <button onClick={addHabit} className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-xl text-sm font-medium hover:opacity-90">
               Add
             </button>
           </div>
         </div>
 
         {/* Reset Button */}
-        <button
-          onClick={resetAll}
-          className="w-full bg-slate-700 hover:bg-slate-600 text-slate-300 py-3 rounded-2xl text-sm font-medium transition-all"
-        >
-          🔄 Reset Today's Progress
+        <button onClick={resetAll} className="w-full bg-slate-700 hover:bg-slate-600 text-slate-300 py-3 rounded-2xl text-sm font-medium transition-all">
+          🔄 Reset Today&apos;s Progress
         </button>
 
         <p className="text-center text-slate-600 text-xs mt-4">Built with ❤️ by Vanshika</p>
